@@ -1,22 +1,20 @@
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
- * @providesModule dumpReactTree
  * @flow
  */
 'use strict';
 
-const ReactNativeMount = require('ReactNativeMount');
+/*
 const getReactData = require('getReactData');
 
 const INDENTATION_SIZE = 2;
 const MAX_DEPTH = 2;
 const MAX_STRING_LENGTH = 50;
+*/
 
 /**
  * Dump all React Native root views and their content. This function tries
@@ -32,6 +30,12 @@ function dumpReactTree() {
 }
 
 function getReactTree() {
+  // TODO(sema): Reenable tree dumps using the Fiber tree structure. #15945684
+  return (
+    'React tree dumps have been temporarily disabled while React is ' +
+    'upgraded to Fiber.'
+  );
+/*
   let output = '';
   const rootIds = Object.getOwnPropertyNames(ReactNativeMount._instancesByContainerID);
   for (const rootId of rootIds) {
@@ -41,8 +45,10 @@ function getReactTree() {
     output += `============ End root ID: ${rootId} ============\n`;
   }
   return output;
+*/
 }
 
+/*
 function dumpNode(node: Object, identation: number) {
   const data = getReactData(node);
   if (data.nodeType === 'Text') {
@@ -101,7 +107,6 @@ function convertObject(object: Object, depth: number) {
     if (!first) {
       output += ', ';
     }
-    // $FlowFixMe(>=0.28.0)
     output += `${key}: ${convertValue(object[key], depth + 1)}`;
     first = false;
   }
@@ -139,5 +144,6 @@ function possiblyEllipsis(value: string) {
 function indent(size: number) {
   return ' '.repeat(size * INDENTATION_SIZE);
 }
+*/
 
 module.exports = dumpReactTree;

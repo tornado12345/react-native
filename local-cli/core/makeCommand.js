@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+'use strict';
+
 const spawn = require('child_process').spawn;
 
 module.exports = function makeCommand(command) {
@@ -16,7 +24,7 @@ module.exports = function makeCommand(command) {
 
     commandProcess.on('close', function prelink(code) {
       if (code) {
-        throw new Error(`Error occured during executing "${command}" command`);
+        throw new Error(`Error occurred during executing "${command}" command`);
       }
 
       cb();

@@ -1,18 +1,15 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 #import "RCTPhotoLibraryImageLoader.h"
 
 #import <Photos/Photos.h>
 
-#import "RCTImageUtils.h"
-#import "RCTUtils.h"
+#import <React/RCTUtils.h>
 
 @implementation RCTPhotoLibraryImageLoader
 
@@ -45,7 +42,10 @@ RCT_EXPORT_MODULE()
   // form of an, NSURL which is what assets-library uses.
   NSString *assetID = @"";
   PHFetchResult *results;
-  if ([imageURL.scheme caseInsensitiveCompare:@"assets-library"] == NSOrderedSame) {
+  if (!imageURL) {
+    completionHandler(RCTErrorWithMessage(@"Cannot load a photo library asset with no URL"), nil);
+    return ^{};
+  } else if ([imageURL.scheme caseInsensitiveCompare:@"assets-library"] == NSOrderedSame) {
     assetID = [imageURL absoluteString];
     results = [PHAsset fetchAssetsWithALAssetURLs:@[imageURL] options:nil];
   } else {

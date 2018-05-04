@@ -1,10 +1,8 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 package com.facebook.react.modules.datepicker;
@@ -48,6 +46,7 @@ public class DatePickerDialogModule extends ReactContextBaseJavaModule {
   /* package */ static final String ARG_DATE = "date";
   /* package */ static final String ARG_MINDATE = "minDate";
   /* package */ static final String ARG_MAXDATE = "maxDate";
+  /* package */ static final String ARG_MODE = "mode";
 
   /* package */ static final String ACTION_DATE_SET = "dateSetAction";
   /* package */ static final String ACTION_DISMISSED = "dismissedAction";
@@ -109,6 +108,9 @@ public class DatePickerDialogModule extends ReactContextBaseJavaModule {
    *     {@code maxDate} (timestamp in milliseconds) the maximum date the user should be allowed
    *     to select
    *    </li>
+   *   <li>
+   *      {@code mode} To set the date picker mode to 'calendar/spinner/default'
+   *   </li>
    * </ul>
    *
    * @param promise This will be invoked with parameters action, year,
@@ -172,6 +174,9 @@ public class DatePickerDialogModule extends ReactContextBaseJavaModule {
     }
     if (options.hasKey(ARG_MAXDATE) && !options.isNull(ARG_MAXDATE)) {
       args.putLong(ARG_MAXDATE, (long) options.getDouble(ARG_MAXDATE));
+    }
+    if (options.hasKey(ARG_MODE) && !options.isNull(ARG_MODE)) {
+      args.putString(ARG_MODE, options.getString(ARG_MODE));
     }
     return args;
   }

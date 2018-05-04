@@ -1,10 +1,8 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 package com.facebook.react.modules.debug;
@@ -13,8 +11,6 @@ import javax.annotation.Nullable;
 
 import java.util.Locale;
 
-import android.os.Build;
-import android.view.Choreographer;
 import android.widget.Toast;
 
 import com.facebook.common.logging.FLog;
@@ -24,13 +20,17 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.common.ReactConstants;
 import com.facebook.react.module.annotations.ReactModule;
+import com.facebook.react.modules.core.ChoreographerCompat;
+import com.facebook.react.modules.debug.interfaces.DeveloperSettings;
 
 /**
  * Module that records debug information during transitions (animated navigation events such as
  * going from one screen to another).
  */
-@ReactModule(name = "AnimationsDebugModule")
+@ReactModule(name = AnimationsDebugModule.NAME)
 public class AnimationsDebugModule extends ReactContextBaseJavaModule {
+
+  protected static final String NAME = "AnimationsDebugModule";
 
   private @Nullable FpsDebugFrameCallback mFrameCallback;
   private @Nullable final DeveloperSettings mCatalystSettings;
@@ -44,7 +44,7 @@ public class AnimationsDebugModule extends ReactContextBaseJavaModule {
 
   @Override
   public String getName() {
-    return "AnimationsDebugModule";
+    return NAME;
   }
 
   @ReactMethod
@@ -57,10 +57,9 @@ public class AnimationsDebugModule extends ReactContextBaseJavaModule {
     if (mFrameCallback != null) {
       throw new JSApplicationCausedNativeException("Already recording FPS!");
     }
-    checkAPILevel();
 
     mFrameCallback = new FpsDebugFrameCallback(
-                          Choreographer.getInstance(),
+                          ChoreographerCompat.getInstance(),
                           getReactApplicationContext());
     mFrameCallback.startAndRecordFpsAtEachFrame();
   }
@@ -75,7 +74,6 @@ public class AnimationsDebugModule extends ReactContextBaseJavaModule {
     if (mFrameCallback == null) {
       return;
     }
-    checkAPILevel();
 
     mFrameCallback.stop();
 
@@ -111,13 +109,6 @@ public class AnimationsDebugModule extends ReactContextBaseJavaModule {
     if (mFrameCallback != null) {
       mFrameCallback.stop();
       mFrameCallback = null;
-    }
-  }
-
-  private static void checkAPILevel() {
-    if (Build.VERSION.SDK_INT < 16) {
-      throw new JSApplicationCausedNativeException(
-          "Animation debugging is not supported in API <16");
     }
   }
 }

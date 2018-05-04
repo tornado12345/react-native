@@ -1,18 +1,12 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
- * @providesModule createStrictShapeTypeChecker
  * @flow
  */
 'use strict';
-
-var ReactPropTypeLocationNames = require('react/lib/ReactPropTypeLocationNames');
-var ReactPropTypesSecret = require('react/lib/ReactPropTypesSecret');
 
 var invariant = require('fbjs/lib/invariant');
 var merge = require('merge');
@@ -20,7 +14,7 @@ var merge = require('merge');
 function createStrictShapeTypeChecker(
   shapeTypes: {[key: string]: ReactPropsCheckType}
 ): ReactPropsChainableTypeChecker {
-  function checkType(isRequired, props, propName, componentName, location?) {
+  function checkType(isRequired, props, propName, componentName, location?, ...rest) {
     if (!props[propName]) {
       if (isRequired) {
         invariant(
@@ -33,8 +27,7 @@ function createStrictShapeTypeChecker(
     }
     var propValue = props[propName];
     var propType = typeof propValue;
-    var locationName =
-      location && ReactPropTypeLocationNames[location] || '(unknown)';
+    var locationName = location || '(unknown)';
     if (propType !== 'object') {
       invariant(
         false,
@@ -51,16 +44,16 @@ function createStrictShapeTypeChecker(
         invariant(
           false,
           `Invalid props.${propName} key \`${key}\` supplied to \`${componentName}\`.` +
-            `\nBad object: ` + JSON.stringify(props[propName], null, '  ') +
-            `\nValid keys: ` + JSON.stringify(Object.keys(shapeTypes), null, '  ')
+            '\nBad object: ' + JSON.stringify(props[propName], null, '  ') +
+            '\nValid keys: ' + JSON.stringify(Object.keys(shapeTypes), null, '  ')
         );
       }
-      var error = checker(propValue, key, componentName, location, null, ReactPropTypesSecret);
+      var error = checker(propValue, key, componentName, location, ...rest);
       if (error) {
         invariant(
           false,
           error.message +
-            `\nBad object: ` + JSON.stringify(props[propName], null, '  ')
+            '\nBad object: ' + JSON.stringify(props[propName], null, '  ')
         );
       }
     }
@@ -69,9 +62,10 @@ function createStrictShapeTypeChecker(
     props: {[key: string]: any},
     propName: string,
     componentName: string,
-    location?: string
+    location?: string,
+    ...rest
   ): ?Error {
-    return checkType(false, props, propName, componentName, location);
+    return checkType(false, props, propName, componentName, location, ...rest);
   }
   chainedCheckType.isRequired = checkType.bind(null, true);
   return chainedCheckType;

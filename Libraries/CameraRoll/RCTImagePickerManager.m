@@ -1,26 +1,22 @@
 /*
- *  Copyright (c) 2013, Facebook, Inc.
- *  All rights reserved.
+ * Copyright (c) 2013-present, Facebook, Inc.
  *
- *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant
- *  of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  */
 
 #import "RCTImagePickerManager.h"
-#import "RCTImageStoreManager.h"
-
-#import "RCTConvert.h"
-#import "RCTRootView.h"
-#import "RCTLog.h"
-#import "RCTUtils.h"
-
-#import <UIKit/UIKit.h>
 
 #import <MobileCoreServices/UTCoreTypes.h>
+#import <UIKit/UIKit.h>
 
-@interface RCTImagePickerManager ()<UIImagePickerControllerDelegate, UINavigationControllerDelegate>
+#import <React/RCTConvert.h>
+#import <React/RCTImageStoreManager.h>
+#import <React/RCTRootView.h>
+#import <React/RCTUtils.h>
+
+@interface RCTImagePickerManager () <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
 @end
 

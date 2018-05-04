@@ -1,10 +1,8 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 package com.facebook.react.modules.storage;
@@ -25,7 +23,6 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.ReactConstants;
-import com.facebook.react.common.SetBuilder;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.common.ModuleDataCleaner;
 
@@ -33,9 +30,11 @@ import static com.facebook.react.modules.storage.ReactDatabaseSupplier.KEY_COLUM
 import static com.facebook.react.modules.storage.ReactDatabaseSupplier.TABLE_CATALYST;
 import static com.facebook.react.modules.storage.ReactDatabaseSupplier.VALUE_COLUMN;
 
-@ReactModule(name = "AsyncSQLiteDBStorage")
+@ReactModule(name = AsyncStorageModule.NAME)
 public final class AsyncStorageModule
     extends ReactContextBaseJavaModule implements ModuleDataCleaner.Cleanable {
+
+  protected static final String NAME = "AsyncSQLiteDBStorage";
 
   // SQL variable number limit, defined by SQLITE_LIMIT_VARIABLE_NUMBER:
   // https://raw.githubusercontent.com/android/platform_external_sqlite/master/dist/sqlite3.c
@@ -51,7 +50,7 @@ public final class AsyncStorageModule
 
   @Override
   public String getName() {
-    return "AsyncSQLiteDBStorage";
+    return NAME;
   }
 
   @Override
@@ -93,7 +92,7 @@ public final class AsyncStorageModule
         }
 
         String[] columns = {KEY_COLUMN, VALUE_COLUMN};
-        HashSet<String> keysRemaining = SetBuilder.newHashSet();
+        HashSet<String> keysRemaining = new HashSet<>();
         WritableArray data = Arguments.createArray();
         for (int keyStart = 0; keyStart < keys.size(); keyStart += MAX_SQL_KEYS) {
           int keyCount = Math.min(keys.size() - keyStart, MAX_SQL_KEYS);

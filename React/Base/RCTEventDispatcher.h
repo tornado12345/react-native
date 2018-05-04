@@ -1,15 +1,13 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 #import <UIKit/UIKit.h>
 
-#import "RCTBridge.h"
+#import <React/RCTBridge.h>
 
 typedef NS_ENUM(NSInteger, RCTTextEventType)
 {
@@ -58,10 +56,9 @@ RCT_EXTERN NSString *RCTNormalizeInputEventName(NSString *eventName);
 
 /**
  * Called before dispatching an event, on the same thread the event was
- * dispatched from. Return YES if the event was handled and must not be
- * sent to JS.
+ * dispatched from.
  */
-- (BOOL)eventDispatcherWillDispatchEvent:(id<RCTEvent>)event;
+- (void)eventDispatcherWillDispatchEvent:(id<RCTEvent>)event;
 
 @end
 

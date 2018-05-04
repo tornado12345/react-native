@@ -1,5 +1,8 @@
 /**
- * Copyright 2004-present Facebook. All Rights Reserved.
+ * Copyright (c) 2004-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 'use strict';
@@ -24,11 +27,11 @@ module.exports = function symbolMember(babel) {
   return {
     visitor: {
       MemberExpression(path) {
-        let node = path.node;
-
-        if (!isAppropriateMember(node)) {
+        if (!isAppropriateMember(path)) {
           return;
         }
+
+        let node = path.node;
 
         path.replaceWith(
           t.conditionalExpression(
@@ -54,8 +57,11 @@ module.exports = function symbolMember(babel) {
   };
 };
 
-function isAppropriateMember(node) {
-  return node.object.type === 'Identifier' &&
+function isAppropriateMember(path) {
+  let node = path.node;
+
+  return path.parentPath.type !== 'AssignmentExpression' &&
+    node.object.type === 'Identifier' &&
     node.object.name === 'Symbol' &&
     node.property.type === 'Identifier';
 }

@@ -1,78 +1,131 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
- * @providesModule AppContainer
- * @noflow
+ * @format
+ * @flow
  */
 
 'use strict';
 
-var RCTDeviceEventEmitter = require('RCTDeviceEventEmitter');
-var React = require('React');
-var ReactNative = require('ReactNative');
-var StyleSheet = require('StyleSheet');
-var Subscribable = require('Subscribable');
-var View = require('View');
+const EmitterSubscription = require('EmitterSubscription');
+const PropTypes = require('prop-types');
+const RCTDeviceEventEmitter = require('RCTDeviceEventEmitter');
+const React = require('React');
+const ReactNative = require('ReactNative');
+const StyleSheet = require('StyleSheet');
+const View = require('View');
 
-var Inspector = __DEV__ ? require('Inspector') : null;
-var YellowBox = __DEV__ ? require('YellowBox') : null;
+type Context = {
+  rootTag: number,
+};
+type Props = {|
+  /* $FlowFixMe(>=0.53.0 site=react_native_fb,react_native_oss) This comment
+   * suppresses an error when upgrading Flow's support for React. To see the
+   * error delete this comment and run Flow. */
+  children?: React.Children,
+  rootTag: number,
+  WrapperComponent?: ?React.ComponentType<*>,
+|};
+type State = {
+  inspector: ?React.Element<any>,
+  mainKey: number,
+};
 
-var AppContainer = React.createClass({
-  mixins: [Subscribable.Mixin],
+class AppContainer extends React.Component<Props, State> {
+  state: State = {
+    inspector: null,
+    mainKey: 1,
+  };
+  _mainRef: ?React.Element<any>;
+  _subscription: ?EmitterSubscription = null;
 
-  getInitialState: function() {
-    return { inspector: null, mainKey: 1 };
-  },
+  static childContextTypes = {
+    rootTag: PropTypes.number,
+  };
 
-  toggleElementInspector: function() {
-    var inspector = !__DEV__ || this.state.inspector
-      ? null
-      : <Inspector
-          inspectedViewTag={ReactNative.findNodeHandle(this.refs.main)}
-          onRequestRerenderApp={(updateInspectedViewTag) => {
-            this.setState(
-              (s) => ({mainKey: s.mainKey + 1}),
-              () => updateInspectedViewTag(ReactNative.findNodeHandle(this.refs.main))
+  getChildContext(): Context {
+    return {
+      rootTag: this.props.rootTag,
+    };
+  }
+
+  componentDidMount(): void {
+    if (__DEV__) {
+      if (!global.__RCTProfileIsProfiling) {
+        this._subscription = RCTDeviceEventEmitter.addListener(
+          'toggleElementInspector',
+          () => {
+            const Inspector = require('Inspector');
+            const inspector = this.state.inspector ? null : (
+              <Inspector
+                inspectedViewTag={ReactNative.findNodeHandle(this._mainRef)}
+                onRequestRerenderApp={updateInspectedViewTag => {
+                  this.setState(
+                    s => ({mainKey: s.mainKey + 1}),
+                    () =>
+                      updateInspectedViewTag(
+                        ReactNative.findNodeHandle(this._mainRef),
+                      ),
+                  );
+                }}
+              />
             );
-          }}
-        />;
-    this.setState({inspector});
-  },
+            this.setState({inspector});
+          },
+        );
+      }
+    }
+  }
 
-  componentDidMount: function() {
-    this.addListenerOn(
-      RCTDeviceEventEmitter,
-      'toggleElementInspector',
-      this.toggleElementInspector
-    );
-  },
+  componentWillUnmount(): void {
+    if (this._subscription) {
+      this._subscription.remove();
+    }
+  }
 
-  render: function() {
+  render(): React.Node {
     let yellowBox = null;
     if (__DEV__) {
-      yellowBox = <YellowBox />;
+      if (!global.__RCTProfileIsProfiling) {
+        const YellowBox = require('YellowBox');
+        yellowBox = <YellowBox />;
+      }
+    }
+
+    let innerView = (
+      <View
+        collapsable={!this.state.inspector}
+        key={this.state.mainKey}
+        pointerEvents="box-none"
+        style={styles.appContainer}
+        ref={ref => {
+          /* $FlowFixMe(>=0.53.0 site=react_native_fb,react_native_oss) This
+           * comment suppresses an error when upgrading Flow's support for
+           * React. To see the error delete this comment and run Flow. */
+          this._mainRef = ref;
+        }}>
+        {this.props.children}
+      </View>
+    );
+
+    const Wrapper = this.props.WrapperComponent;
+    if (Wrapper) {
+      innerView = <Wrapper>{innerView}</Wrapper>;
     }
     return (
-      <View style={styles.appContainer}>
-        <View
-          collapsable={!this.state.inspector}
-          key={this.state.mainKey}
-          style={styles.appContainer} ref="main">
-          {this.props.children}
-        </View>
+      <View style={styles.appContainer} pointerEvents="box-none">
+        {innerView}
         {yellowBox}
         {this.state.inspector}
       </View>
     );
   }
-});
+}
 
-var styles = StyleSheet.create({
+const styles = StyleSheet.create({
   appContainer: {
     flex: 1,
   },

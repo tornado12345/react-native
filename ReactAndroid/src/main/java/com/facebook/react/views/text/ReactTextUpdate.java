@@ -1,14 +1,13 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 package com.facebook.react.views.text;
 
+import android.text.Layout;
 import android.text.Spannable;
 
 /**
@@ -26,6 +25,32 @@ public class ReactTextUpdate {
   private final float mPaddingRight;
   private final float mPaddingBottom;
   private final int mTextAlign;
+  private final int mTextBreakStrategy;
+
+  /**
+   * @deprecated Use a non-deprecated constructor for ReactTextUpdate instead. This one remains
+   * because it's being used by a unit test that isn't currently open source.
+   */
+  @Deprecated
+  public ReactTextUpdate(
+      Spannable text,
+      int jsEventCounter,
+      boolean containsImages,
+      float paddingStart,
+      float paddingTop,
+      float paddingEnd,
+      float paddingBottom,
+      int textAlign) {
+    this(text,
+        jsEventCounter,
+        containsImages,
+        paddingStart,
+        paddingTop,
+        paddingEnd,
+        paddingBottom,
+        textAlign,
+        Layout.BREAK_STRATEGY_HIGH_QUALITY);
+  }
 
   public ReactTextUpdate(
     Spannable text,
@@ -35,7 +60,8 @@ public class ReactTextUpdate {
     float paddingTop,
     float paddingEnd,
     float paddingBottom,
-    int textAlign) {
+    int textAlign,
+    int textBreakStrategy) {
     mText = text;
     mJsEventCounter = jsEventCounter;
     mContainsImages = containsImages;
@@ -44,6 +70,7 @@ public class ReactTextUpdate {
     mPaddingRight = paddingEnd;
     mPaddingBottom = paddingBottom;
     mTextAlign = textAlign;
+    mTextBreakStrategy = textBreakStrategy;
   }
 
   public Spannable getText() {
@@ -76,5 +103,9 @@ public class ReactTextUpdate {
 
   public int getTextAlign() {
     return mTextAlign;
+  }
+
+  public int getTextBreakStrategy() {
+    return mTextBreakStrategy;
   }
 }

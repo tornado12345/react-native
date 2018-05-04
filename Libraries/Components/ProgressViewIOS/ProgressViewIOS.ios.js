@@ -1,34 +1,32 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
- * @providesModule ProgressViewIOS
  * @flow
  */
 'use strict';
 
-var Image = require('Image');
-var NativeMethodsMixin = require('NativeMethodsMixin');
-var React = require('React');
-var StyleSheet = require('StyleSheet');
-var View = require('View');
+const Image = require('Image');
+const NativeMethodsMixin = require('NativeMethodsMixin');
+const React = require('React');
+const PropTypes = require('prop-types');
+const StyleSheet = require('StyleSheet');
+const ViewPropTypes = require('ViewPropTypes');
 
-var requireNativeComponent = require('requireNativeComponent');
-
-var PropTypes = React.PropTypes;
+const createReactClass = require('create-react-class');
+const requireNativeComponent = require('requireNativeComponent');
 
 /**
  * Use `ProgressViewIOS` to render a UIProgressView on iOS.
  */
-var ProgressViewIOS = React.createClass({
+const ProgressViewIOS = createReactClass({
+  displayName: 'ProgressViewIOS',
   mixins: [NativeMethodsMixin],
 
   propTypes: {
-    ...View.propTypes,
+    ...ViewPropTypes,
     /**
      * The progress bar style.
      */
@@ -70,13 +68,13 @@ var ProgressViewIOS = React.createClass({
   }
 });
 
-var styles = StyleSheet.create({
+const styles = StyleSheet.create({
   progressView: {
     height: 2,
   },
 });
 
-var RCTProgressView = requireNativeComponent(
+const RCTProgressView = requireNativeComponent(
   'RCTProgressView',
   ProgressViewIOS
 );

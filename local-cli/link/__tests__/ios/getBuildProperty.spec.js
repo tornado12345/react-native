@@ -1,6 +1,13 @@
-'use strict';
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+javascript_foundation
+ */
 
-jest.autoMockOff();
+'use strict';
 
 const xcode = require('xcode');
 const path = require('path');
@@ -17,6 +24,6 @@ describe('ios::getBuildProperty', () => {
 
   it('should return build property from main target', () => {
     const plistPath = getBuildProperty(project, 'INFOPLIST_FILE');
-    expect(plistPath).toEqual('"Basic/Info.plist"');
+    expect(plistPath).toEqual('Basic/Info.plist');
   });
 });

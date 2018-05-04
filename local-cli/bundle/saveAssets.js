@@ -1,13 +1,12 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 'use strict';
 
+const filterPlatformAssetScales = require('./filterPlatformAssetScales');
 const fs = require('fs');
 const getAssetDestPathAndroid = require('./getAssetDestPathAndroid');
 const getAssetDestPathIOS = require('./getAssetDestPathIOS');
@@ -31,14 +30,17 @@ function saveAssets(
 
   const filesToCopy = Object.create(null); // Map src -> dest
   assets
-    .filter(asset => !asset.deprecated)
-    .forEach(asset =>
+    .forEach(asset => {
+      const validScales = new Set(filterPlatformAssetScales(platform, asset.scales));
       asset.scales.forEach((scale, idx) => {
+        if (!validScales.has(scale)) {
+          return;
+        }
         const src = asset.files[idx];
         const dest = path.join(assetsDest, getAssetDestPath(asset, scale));
         filesToCopy[src] = dest;
-      })
-    );
+      });
+    });
 
   return copyAll(filesToCopy);
 }

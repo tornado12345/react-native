@@ -1,44 +1,100 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
- * @providesModule Slider
  * @flow
  */
 'use strict';
 
-var Image = require('Image');
-var NativeMethodsMixin = require('NativeMethodsMixin');
-var ReactNativeViewAttributes = require('ReactNativeViewAttributes');
-var Platform = require('Platform');
-var React = require('React');
-var StyleSheet = require('StyleSheet');
-var View = require('View');
+const Image = require('Image');
+const ColorPropType = require('ColorPropType');
+const NativeMethodsMixin = require('NativeMethodsMixin');
+const ReactNativeViewAttributes = require('ReactNativeViewAttributes');
+const Platform = require('Platform');
+const React = require('React');
+const PropTypes = require('prop-types');
+const StyleSheet = require('StyleSheet');
+const ViewPropTypes = require('ViewPropTypes');
 
-var requireNativeComponent = require('requireNativeComponent');
-
-var PropTypes = React.PropTypes;
+const createReactClass = require('create-react-class');
+const requireNativeComponent = require('requireNativeComponent');
 
 type Event = Object;
 
 /**
  * A component used to select a single value from a range of values.
+ *
+ * ### Usage
+ *
+ * The example below shows how to use `Slider` to change
+ * a value used by `Text`. The value is stored using
+ * the state of the root component (`App`). The same component
+ * subscribes to the `onValueChange`  of `Slider` and changes
+ * the value using `setState`.
+ *
+ *```
+ * import React from 'react';
+ * import { StyleSheet, Text, View, Slider } from 'react-native';
+ *
+ * export default class App extends React.Component {
+ *   constructor(props) {
+ *     super(props);
+ *     this.state = {
+ *       value: 50
+ *     }
+ *   }
+ *
+ *   change(value) {
+ *     this.setState(() => {
+ *       return {
+ *         value: parseFloat(value)
+ *       };
+ *     });
+ *   }
+ *
+ *   render() {
+ *     const {value} = this.state;
+ *     return (
+ *       <View style={styles.container}>
+ *         <Text style={styles.text}>{String(value)}</Text>
+ *         <Slider
+ *           step={1}
+ *           maximumValue={100}
+ *           onValueChange={this.change.bind(this)}
+ *           value={value} />
+ *       </View>
+ *     );
+ *   }
+ * }
+ *
+ * const styles = StyleSheet.create({
+ *   container: {
+ *     flex: 1,
+ *     flexDirection: 'column',
+ *     justifyContent: 'center'
+ *   },
+ *   text: {
+ *     fontSize: 50,
+ *     textAlign: 'center'
+ *   }
+ * });
+ *```
+ *
  */
-var Slider = React.createClass({
+const Slider = createReactClass({
+  displayName: 'Slider',
   mixins: [NativeMethodsMixin],
 
   propTypes: {
-    ...View.propTypes,
+    ...ViewPropTypes,
 
     /**
      * Used to style and layout the `Slider`.  See `StyleSheet.js` and
      * `ViewStylePropTypes.js` for more info.
      */
-    style: View.propTypes.style,
+    style: ViewPropTypes.style,
 
     /**
      * Initial value of the slider. The value should be between minimumValue
@@ -68,18 +124,16 @@ var Slider = React.createClass({
     maximumValue: PropTypes.number,
 
     /**
-     * The color used for the track to the left of the button. Overrides the
-     * default blue gradient image.
-     * @platform ios
+     * The color used for the track to the left of the button.
+     * Overrides the default blue gradient image on iOS.
      */
-    minimumTrackTintColor: PropTypes.string,
+    minimumTrackTintColor: ColorPropType,
 
     /**
-     * The color used for the track to the right of the button. Overrides the
-     * default blue gradient image.
-     * @platform ios
+     * The color used for the track to the right of the button.
+     * Overrides the default blue gradient image on iOS.
      */
-    maximumTrackTintColor: PropTypes.string,
+    maximumTrackTintColor: ColorPropType,
 
     /**
      * If true the user won't be able to move the slider.
@@ -115,13 +169,20 @@ var Slider = React.createClass({
     thumbImage: Image.propTypes.source,
 
     /**
+     * Color of the foreground switch grip.
+     * @platform android
+     */
+    thumbTintColor: ColorPropType,
+
+    /**
      * Callback continuously called while the user is dragging the slider.
      */
     onValueChange: PropTypes.func,
 
     /**
-     * Callback called when the user finishes changing the value (e.g. when
-     * the slider is released).
+     * Callback that is called when the user releases the slider,
+     * regardless if the value has changed. The current value is passed
+     * as an argument to the callback handler.
      */
     onSlidingComplete: PropTypes.func,
 
@@ -151,8 +212,14 @@ var Slider = React.createClass({
 
   render: function() {
     const {style, onValueChange, onSlidingComplete, ...props} = this.props;
+    /* $FlowFixMe(>=0.54.0 site=react_native_fb,react_native_oss) This comment
+     * suppresses an error found when Flow v0.54 was deployed. To see the error
+     * delete this comment and run Flow. */
     props.style = [styles.slider, style];
 
+    /* $FlowFixMe(>=0.54.0 site=react_native_fb,react_native_oss) This comment
+     * suppresses an error found when Flow v0.54 was deployed. To see the error
+     * delete this comment and run Flow. */
     props.onValueChange = onValueChange && ((event: Event) => {
       let userEvent = true;
       if (Platform.OS === 'android') {
@@ -163,8 +230,14 @@ var Slider = React.createClass({
       onValueChange && userEvent && onValueChange(event.nativeEvent.value);
     });
 
+    /* $FlowFixMe(>=0.54.0 site=react_native_fb,react_native_oss) This comment
+     * suppresses an error found when Flow v0.54 was deployed. To see the error
+     * delete this comment and run Flow. */
     props.onChange = props.onValueChange;
 
+    /* $FlowFixMe(>=0.54.0 site=react_native_fb,react_native_oss) This comment
+     * suppresses an error found when Flow v0.54 was deployed. To see the error
+     * delete this comment and run Flow. */
     props.onSlidingComplete = onSlidingComplete && ((event: Event) => {
       onSlidingComplete && onSlidingComplete(event.nativeEvent.value);
     });

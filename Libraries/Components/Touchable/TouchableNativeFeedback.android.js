@@ -1,53 +1,52 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
- * @providesModule TouchableNativeFeedback
  */
 'use strict';
 
-var Platform = require('Platform');
-var React = require('React');
-var ReactNative = require('ReactNative');
-var Touchable = require('Touchable');
-var TouchableWithoutFeedback = require('TouchableWithoutFeedback');
-var UIManager = require('UIManager');
+const Platform = require('Platform');
+const React = require('React');
+const PropTypes = require('prop-types');
+const ReactNative = require('ReactNative');
+const Touchable = require('Touchable');
+const TouchableWithoutFeedback = require('TouchableWithoutFeedback');
+const UIManager = require('UIManager');
 
-var ensurePositiveDelayProps = require('ensurePositiveDelayProps');
-var processColor = require('processColor');
+const createReactClass = require('create-react-class');
+const ensurePositiveDelayProps = require('ensurePositiveDelayProps');
+const processColor = require('processColor');
 
-var PropTypes = React.PropTypes;
-
-var rippleBackgroundPropType = PropTypes.shape({
-  type: React.PropTypes.oneOf(['RippleAndroid']),
+const rippleBackgroundPropType = PropTypes.shape({
+  type: PropTypes.oneOf(['RippleAndroid']),
   color: PropTypes.number,
   borderless: PropTypes.bool,
 });
 
-var themeAttributeBackgroundPropType = PropTypes.shape({
-  type: React.PropTypes.oneOf(['ThemeAttrAndroid']),
+const themeAttributeBackgroundPropType = PropTypes.shape({
+  type: PropTypes.oneOf(['ThemeAttrAndroid']),
   attribute: PropTypes.string.isRequired,
 });
 
-var backgroundPropType = PropTypes.oneOfType([
+const backgroundPropType = PropTypes.oneOfType([
   rippleBackgroundPropType,
   themeAttributeBackgroundPropType,
 ]);
 
 type Event = Object;
 
-var PRESS_RETENTION_OFFSET = {top: 20, left: 20, right: 20, bottom: 30};
+const PRESS_RETENTION_OFFSET = {top: 20, left: 20, right: 20, bottom: 30};
 
 /**
  * A wrapper for making views respond properly to touches (Android only).
  * On Android this component uses native state drawable to display touch
- * feedback. At the moment it only supports having a single View instance as a
- * child node, as it's implemented by replacing that View with another instance
- * of RCTView node with some additional properties set.
+ * feedback.
+ *
+ * At the moment it only supports having a single View instance as a child
+ * node, as it's implemented by replacing that View with another instance of
+ * RCTView node with some additional properties set.
  *
  * Background drawable of native feedback touchable can be customized with
  * `background` property.
@@ -69,7 +68,8 @@ var PRESS_RETENTION_OFFSET = {top: 20, left: 20, right: 20, bottom: 30};
  * ```
  */
 
-var TouchableNativeFeedback = React.createClass({
+const TouchableNativeFeedback = createReactClass({
+  displayName: 'TouchableNativeFeedback',
   propTypes: {
     ...TouchableWithoutFeedback.propTypes,
 
@@ -80,6 +80,11 @@ var TouchableNativeFeedback = React.createClass({
      * methods to generate that dictionary.
      */
     background: backgroundPropType,
+
+    /**
+     * TV preferred focus (see documentation for the View component).
+     */
+    hasTVPreferredFocus: PropTypes.bool,
 
     /**
      * Set to true to add the ripple effect to the foreground of the view, instead of the
@@ -144,7 +149,7 @@ var TouchableNativeFeedback = React.createClass({
     ensurePositiveDelayProps(this.props);
   },
 
-  componentWillReceiveProps: function(nextProps) {
+  UNSAFE_componentWillReceiveProps: function(nextProps) {
     ensurePositiveDelayProps(nextProps);
   },
 
@@ -155,7 +160,9 @@ var TouchableNativeFeedback = React.createClass({
   touchableHandleActivePressIn: function(e: Event) {
     this.props.onPressIn && this.props.onPressIn(e);
     this._dispatchPressedStateChange(true);
-    this._dispatchHotspotUpdate(this.pressInLocation.locationX, this.pressInLocation.locationY);
+    if (this.pressInLocation) {
+      this._dispatchHotspotUpdate(this.pressInLocation.locationX, this.pressInLocation.locationY);
+    }
   },
 
   touchableHandleActivePressOut: function(e: Event) {
@@ -232,7 +239,7 @@ var TouchableNativeFeedback = React.createClass({
       this.props.useForeground && TouchableNativeFeedback.canUseNativeForeground()
         ? 'nativeForegroundAndroid'
         : 'nativeBackgroundAndroid';
-    var childProps = {
+    const childProps = {
       ...child.props,
       [drawableProp]: this.props.background,
       accessible: this.props.accessible !== false,
@@ -243,6 +250,8 @@ var TouchableNativeFeedback = React.createClass({
       testID: this.props.testID,
       onLayout: this.props.onLayout,
       hitSlop: this.props.hitSlop,
+      isTVSelectable: true,
+      hasTVPreferredFocus: this.props.hasTVPreferredFocus,
       onStartShouldSetResponder: this.touchableHandleStartShouldSetResponder,
       onResponderTerminationRequest: this.touchableHandleResponderTerminationRequest,
       onResponderGrant: this.touchableHandleResponderGrant,
@@ -253,7 +262,7 @@ var TouchableNativeFeedback = React.createClass({
 
     // We need to clone the actual element so that the ripple background drawable
     // can be applied directly to the background of this element rather than to
-    // a wrapper view as done in outher Touchable*
+    // a wrapper view as done in other Touchable*
     return React.cloneElement(
       child,
       childProps

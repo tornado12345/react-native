@@ -1,7 +1,9 @@
 /**
- * Copyright 2004-present Facebook. All Rights Reserved.
+ * Copyright (c) 2015-present, Facebook, Inc.
  *
- * @providesModule MatrixMath
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
  * @noflow
  */
 /* eslint-disable space-infix-ops */
@@ -165,13 +167,11 @@ var MatrixMath = {
   },
 
   reuseSkewXCommand: function(matrixCommand, radians) {
-    matrixCommand[4] = Math.sin(radians);
-    matrixCommand[5] = Math.cos(radians);
+    matrixCommand[4] = Math.tan(radians);
   },
 
   reuseSkewYCommand: function(matrixCommand, radians) {
-    matrixCommand[0] = Math.cos(radians);
-    matrixCommand[1] = Math.sin(radians);
+    matrixCommand[1] = Math.tan(radians);
   },
 
   multiplyInto: function(out, a, b) {

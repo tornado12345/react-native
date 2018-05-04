@@ -1,12 +1,9 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
- * @providesModule FormData
  * @flow
  */
 'use strict';
@@ -71,7 +68,7 @@ class FormData {
       // an object with a `uri` attribute. Optionally, it can also
       // have a `name` and `type` attribute to specify filename and
       // content type (cf. web Blob interface.)
-      if (typeof value === 'object') {
+      if (typeof value === 'object' && value) {
         if (typeof value.name === 'string') {
           headers['content-disposition'] += '; filename="' + value.name + '"';
         }

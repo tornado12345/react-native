@@ -1,21 +1,27 @@
-We use GitHub Issues for bugs.
+<!--
+  We use GitHub Issues exclusively for tracking bugs in React Native.
+  Questions? Visit http://facebook.github.io/react-native/help.html
+  If this issue is about documentation or the website, please file it at:
+  https://github.com/facebook/react-native-website/issues/new
+-->
 
-If you have a non-bug question, ask on Stack Overflow: http://stackoverflow.com/questions/tagged/react-native
+- [ ] I have reviewed the [documentation](https://facebook.github.io/react-native)
+- [ ] I have searched [existing issues](https://github.com/facebook/react-native/issues)
+- [ ] I am using the [latest React Native version](https://github.com/facebook/react-native/releases)
 
-If you have a feature request, post it on Product Pains: https://productpains.com/product/react-native/
+<!-- Describe your issue in detail. -->
 
---- Please use this template, and delete everything above this line before submitting your issue --- 
+## Environment
+<!-- Required. Run `react-native info` in your terminal and paste its contents here. -->
 
-### Description
+## Steps to Reproduce
+<!-- 
+  Required. Let us know how to reproduce the issue. Include a code sample, share a project, 
+  or share an app that reproduces the issue using [Snack](https://snack.expo.io/).
+-->
 
-[FILL THIS OUT: Explain what you did, what you expected to happen, and what actually happens.]
+## Expected Behavior
+<!-- Write what you thought would happen. -->
 
-### Reproduction
-
-[FILL THIS OUT: Try to reproduce your bug on rnplay.org and provide a link. If you can't reproduce the bug on rnplay.org, provide a sample project.]
-
-### Additional Information
-
-* React Native version: [FILL THIS OUT]
-* Platform: [FILL THIS OUT: iOS, Android, or both?]
-* Operating System: [FILL THIS OUT: MacOS, Linux, or Windows?]
+## Actual Behavior
+<!-- Write what happened. Include screenshots if needed. If this is a regression, let us know. -->

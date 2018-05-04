@@ -1,27 +1,19 @@
 /**
- * @generated SignedSource<<ec51291ea6059cf23faa74f8644d17b1>>
+ * Copyright (c) 2015-present, Facebook, Inc.
  *
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * !! This file is a check-in of a static_upstream project!      !!
- * !!                                                            !!
- * !! You should not modify this file directly. Instead:         !!
- * !! 1) Use `fjs use-upstream` to temporarily replace this with !!
- * !!    the latest version from upstream.                       !!
- * !! 2) Make your changes, test them, etc.                      !!
- * !! 3) Use `fjs push-upstream` to copy your changes back to    !!
- * !!    static_upstream.                                        !!
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
- * @providesModule clamp
  * @typechecks
  */
+'use strict';
 
- /**
-  * @param {number} value
-  * @param {number} min
-  * @param {number} max
-  * @return {number}
-  */
+/**
+ * @param {number} min
+ * @param {number} value
+ * @param {number} max
+ * @return {number}
+ */
 function clamp(min, value, max) {
   if (value < min) {
     return min;

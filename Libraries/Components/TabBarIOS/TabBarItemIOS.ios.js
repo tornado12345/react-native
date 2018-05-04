@@ -1,40 +1,45 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
- * @providesModule TabBarItemIOS
  * @noflow
  */
 'use strict';
 
-var Image = require('Image');
-var React = require('React');
-var StaticContainer = require('StaticContainer.react');
-var StyleSheet = require('StyleSheet');
-var View = require('View');
+const ColorPropType = require('ColorPropType');
+const Image = require('Image');
+const React = require('React');
+const PropTypes = require('prop-types');
+const StaticContainer = require('StaticContainer.react');
+const StyleSheet = require('StyleSheet');
+const View = require('View');
 
-var requireNativeComponent = require('requireNativeComponent');
+const ViewPropTypes = require('ViewPropTypes');
+
+const requireNativeComponent = require('requireNativeComponent');
 
 class TabBarItemIOS extends React.Component {
   static propTypes = {
-    ...View.propTypes,
+    ...ViewPropTypes,
     /**
      * Little red bubble that sits at the top right of the icon.
      */
-    badge: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.number,
+    badge: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
     ]),
+    /**
+     * Background color for the badge. Available since iOS 10.
+     */
+    badgeColor: ColorPropType,
     /**
      * Items comes with a few predefined system icons. Note that if you are
      * using them, the title and selectedIcon will be overridden with the
      * system ones.
      */
-    systemIcon: React.PropTypes.oneOf([
+    systemIcon: PropTypes.oneOf([
       'bookmarks',
       'contacts',
       'downloads',
@@ -61,46 +66,53 @@ class TabBarItemIOS extends React.Component {
      * Callback when this tab is being selected, you should change the state of your
      * component to set selected={true}.
      */
-    onPress: React.PropTypes.func,
+    onPress: PropTypes.func,
     /**
      * If set to true it renders the image as original,
      * it defaults to being displayed as a template
      */
-    renderAsOriginal: React.PropTypes.bool,
+    renderAsOriginal: PropTypes.bool,
     /**
      * It specifies whether the children are visible or not. If you see a
      * blank content, you probably forgot to add a selected one.
      */
-    selected: React.PropTypes.bool,
+    selected: PropTypes.bool,
     /**
      * React style object.
      */
-    style: View.propTypes.style,
+    style: ViewPropTypes.style,
     /**
      * Text that appears under the icon. It is ignored when a system icon
      * is defined.
      */
-    title: React.PropTypes.string,
+    title: PropTypes.string,
+    /**
+     *(Apple TV only)* When set to true, this view will be focusable
+     * and navigable using the Apple TV remote.
+     *
+     * @platform ios
+     */
+    isTVSelectable: PropTypes.bool,
   };
 
   state = {
     hasBeenSelected: false,
   };
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (this.props.selected) {
       this.setState({hasBeenSelected: true});
     }
   }
 
-  componentWillReceiveProps(nextProps: { selected?: boolean }) {
+  UNSAFE_componentWillReceiveProps(nextProps: { selected?: boolean }) {
     if (this.state.hasBeenSelected || nextProps.selected) {
       this.setState({hasBeenSelected: true});
     }
   }
 
   render() {
-    var {style, children, ...props} = this.props;
+    const {style, children, ...props} = this.props;
 
     // if the tab has already been shown once, always continue to show it so we
     // preserve state between tab transitions
@@ -123,7 +135,7 @@ class TabBarItemIOS extends React.Component {
   }
 }
 
-var styles = StyleSheet.create({
+const styles = StyleSheet.create({
   tab: {
     position: 'absolute',
     top: 0,
@@ -133,6 +145,6 @@ var styles = StyleSheet.create({
   }
 });
 
-var RCTTabBarItem = requireNativeComponent('RCTTabBarItem', TabBarItemIOS);
+const RCTTabBarItem = requireNativeComponent('RCTTabBarItem', TabBarItemIOS);
 
 module.exports = TabBarItemIOS;

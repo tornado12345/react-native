@@ -1,10 +1,8 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 #import "RCTRefreshControl.h"
@@ -12,9 +10,11 @@
 #import "RCTUtils.h"
 
 @implementation RCTRefreshControl {
-  BOOL _initialRefreshingState;
   BOOL _isInitialRender;
   BOOL _currentRefreshingState;
+  BOOL _refreshingProgrammatically;
+  NSString *_title;
+  UIColor *_titleColor;
 }
 
 - (instancetype)init
@@ -41,25 +41,22 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
   // If the control is refreshing when mounted we need to call
   // beginRefreshing in layoutSubview or it doesn't work.
-  if (_currentRefreshingState && _isInitialRender && _initialRefreshingState) {
-    [self beginRefreshing];
+  if (_currentRefreshingState && _isInitialRender) {
+    [self beginRefreshingProgrammatically];
   }
   _isInitialRender = false;
 }
 
-- (void)beginRefreshing
+- (void)beginRefreshingProgrammatically
 {
+  _refreshingProgrammatically = YES;
   // When using begin refreshing we need to adjust the ScrollView content offset manually.
   UIScrollView *scrollView = (UIScrollView *)self.superview;
   CGPoint offset = {scrollView.contentOffset.x, scrollView.contentOffset.y - self.frame.size.height};
-  // Don't animate when the prop is set initialy.
-  if (_isInitialRender) {
-    scrollView.contentOffset = offset;
-    [super beginRefreshing];
-  } else {
-    // `beginRefreshing` must be called after the animation is done. This is why it is impossible
-    // to use `setContentOffset` with `animated:YES`.
-    [UIView animateWithDuration:0.25
+
+  // `beginRefreshing` must be called after the animation is done. This is why it is impossible
+  // to use `setContentOffset` with `animated:YES`.
+  [UIView animateWithDuration:0.25
                           delay:0
                         options:UIViewAnimationOptionBeginFromCurrentState
                      animations:^(void) {
@@ -67,16 +64,15 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
                      } completion:^(__unused BOOL finished) {
                        [super beginRefreshing];
                      }];
-  }
 }
 
-- (void)endRefreshing
+- (void)endRefreshingProgrammatically
 {
   // The contentOffset of the scrollview MUST be greater than 0 before calling
   // endRefreshing otherwise the next pull to refresh will not work properly.
   UIScrollView *scrollView = (UIScrollView *)self.superview;
-  if (scrollView.contentOffset.y < 0) {
-    CGPoint offset = {scrollView.contentOffset.x, -scrollView.contentInset.top};
+  if (_refreshingProgrammatically && scrollView.contentOffset.y < 0) {
+    CGPoint offset = {scrollView.contentOffset.x, 0};
     [UIView animateWithDuration:0.25
                           delay:0
                         options:UIViewAnimationOptionBeginFromCurrentState
@@ -92,23 +88,33 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
 - (NSString *)title
 {
-  return self.attributedTitle.string;
+  return _title;
 }
 
 - (void)setTitle:(NSString *)title
 {
-  NSRange range = NSMakeRange(0, self.attributedTitle.length);
-  NSDictionary *attrs = [self.attributedTitle attributesAtIndex:0 effectiveRange: &range];
-  self.attributedTitle = [[NSAttributedString alloc] initWithString:title attributes:attrs];
+  _title = title;
+  [self _updateTitle];
 }
 
 - (void)setTitleColor:(UIColor *)color
 {
-  NSRange range = NSMakeRange(0, self.attributedTitle.length);
-  NSDictionary *attrs = [self.attributedTitle attributesAtIndex:0 effectiveRange: &range];
-  NSMutableDictionary *attrsMutable = [attrs mutableCopy];
-  [attrsMutable setObject:color forKey:NSForegroundColorAttributeName];
-  self.attributedTitle = [[NSAttributedString alloc] initWithString:self.attributedTitle.string attributes:attrsMutable];
+  _titleColor = color;
+  [self _updateTitle];
+}
+
+- (void)_updateTitle
+{
+  if (!_title) {
+    return;
+  }
+
+  NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+  if (_titleColor) {
+    attributes[NSForegroundColorAttributeName] = _titleColor;
+  }
+
+  self.attributedTitle = [[NSAttributedString alloc] initWithString:_title attributes:attributes];
 }
 
 - (void)setRefreshing:(BOOL)refreshing
@@ -117,15 +123,11 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     _currentRefreshingState = refreshing;
 
     if (refreshing) {
-      // If it is the initial render, beginRefreshing will get called
-      // in layoutSubviews.
-      if (_isInitialRender) {
-        _initialRefreshingState = refreshing;
-      } else {
-        [self beginRefreshing];
+      if (!_isInitialRender) {
+        [self beginRefreshingProgrammatically];
       }
     } else {
-      [self endRefreshing];
+      [self endRefreshingProgrammatically];
     }
   }
 }
@@ -133,6 +135,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 - (void)refreshControlValueChanged
 {
   _currentRefreshingState = super.refreshing;
+  _refreshingProgrammatically = NO;
 
   if (_onRefresh) {
     _onRefresh(nil);

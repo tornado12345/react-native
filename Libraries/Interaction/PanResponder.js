@@ -1,18 +1,15 @@
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
- * @providesModule PanResponder
  */
 
 'use strict';
 
 const InteractionManager = require('./InteractionManager');
-const TouchHistoryMath = require('TouchHistoryMath');
+const TouchHistoryMath = require('./TouchHistoryMath');
 
 const currentCentroidXOfTouchesChangedAfter = TouchHistoryMath.currentCentroidXOfTouchesChangedAfter;
 const currentCentroidYOfTouchesChangedAfter = TouchHistoryMath.currentCentroidYOfTouchesChangedAfter;
@@ -26,7 +23,7 @@ const currentCentroidY = TouchHistoryMath.currentCentroidY;
  * single-touch gestures resilient to extra touches, and can be used to
  * recognize simple multi-touch gestures.
  *
- * By default, `PanResponder` holds an `InteractionManager handle to block
+ * By default, `PanResponder` holds an `InteractionManager` handle to block
  * long-running JS events from interrupting active gestures.
  *
  * It provides a predictable wrapper of the responder handlers provided by the
@@ -77,7 +74,7 @@ const currentCentroidY = TouchHistoryMath.currentCentroidY;
  *       onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
  *
  *       onPanResponderGrant: (evt, gestureState) => {
- *         // The guesture has started. Show visual feedback so the user knows
+ *         // The gesture has started. Show visual feedback so the user knows
  *         // what is happening!
  *
  *         // gestureState.d{x,y} will be set to zero now
@@ -116,7 +113,7 @@ const currentCentroidY = TouchHistoryMath.currentCentroidY;
  * ### Working Example
  *
  * To see it in action, try the
- * [PanResponder example in UIExplorer](https://github.com/facebook/react-native/blob/master/Examples/UIExplorer/js/PanResponderExample.js)
+ * [PanResponder example in RNTester](https://github.com/facebook/react-native/blob/master/RNTester/js/PanResponderExample.js)
  */
 
 const PanResponder = {

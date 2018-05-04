@@ -1,17 +1,15 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
- * @providesModule LayoutEventsTest
  * @flow
  */
 'use strict';
 
 var React = require('react');
+var createReactClass = require('create-react-class');
 var ReactNative = require('react-native');
 var {
   Image,
@@ -24,21 +22,11 @@ var { TestModule } = ReactNative.NativeModules;
 
 var deepDiffer = require('deepDiffer');
 
-function debug() {
+function debug(...args) {
   // console.log.apply(null, arguments);
 }
 
-type Layout = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-type LayoutEvent = {
-  nativeEvent: {
-    layout: Layout;
-  };
-};
+import type {Layout, LayoutEvent} from 'CoreEventTypes';
 type Style = {
   margin?: number,
   padding?: number,
@@ -58,7 +46,8 @@ type State = {
   containerStyle?: Style,
 };
 
-var LayoutEventsTest = React.createClass({
+var LayoutEventsTest = createReactClass({
+  displayName: 'LayoutEventsTest',
   getInitialState(): State {
     return {
       didAnimation: false,

@@ -1,22 +1,20 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
- * @providesModule TextStylePropTypes
  * @flow
  */
 'use strict';
 
-var ReactPropTypes = require('React').PropTypes;
-var ColorPropType = require('ColorPropType');
-var ViewStylePropTypes = require('ViewStylePropTypes');
+const ColorPropType = require('ColorPropType');
+const ReactPropTypes = require('prop-types');
+const ViewStylePropTypes = require('ViewStylePropTypes');
 
-// TODO: use spread instead of Object.assign/create after #6560135 is fixed
-var TextStylePropTypes = Object.assign(Object.create(ViewStylePropTypes), {
+const TextStylePropTypes = {
+  ...ViewStylePropTypes,
+
   color: ColorPropType,
   fontFamily: ReactPropTypes.string,
   fontSize: ReactPropTypes.number,
@@ -65,6 +63,13 @@ var TextStylePropTypes = Object.assign(Object.create(ViewStylePropTypes), {
   textAlignVertical: ReactPropTypes.oneOf(
     ['auto' /*default*/, 'top', 'bottom', 'center']
   ),
+  /**
+   * Set to `false` to remove extra font padding intended to make space for certain ascenders / descenders.
+   * With some fonts, this padding can make text look slightly misaligned when centered vertically.
+   * For best results also set `textAlignVertical` to `center`. Default is true.
+   * @platform android
+   */
+  includeFontPadding: ReactPropTypes.bool,
   textDecorationLine: ReactPropTypes.oneOf(
     ['none' /*default*/, 'underline', 'line-through', 'underline line-through']
   ),
@@ -81,9 +86,15 @@ var TextStylePropTypes = Object.assign(Object.create(ViewStylePropTypes), {
   /**
    * @platform ios
    */
+  textTransform: ReactPropTypes.oneOf(
+    ['none' /*default*/, 'capitalize', 'uppercase', 'lowercase']
+  ),
+  /**
+   * @platform ios
+   */
   writingDirection: ReactPropTypes.oneOf(
     ['auto' /*default*/, 'ltr', 'rtl']
   ),
-});
+};
 
 module.exports = TextStylePropTypes;

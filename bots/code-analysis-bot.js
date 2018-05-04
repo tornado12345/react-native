@@ -1,10 +1,8 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 'use strict';
 
@@ -111,6 +109,11 @@ function getFilesFromCommit(user, repo, sha, callback) {
       console.log(error);
       return;
     }
+    // A merge commit should not have any new changes to report
+    if (res.parents && res.parents.length > 1) {
+      return;
+    }
+
     callback(res.files);
   });
 }
@@ -181,6 +184,10 @@ function main(messages, user, repo, number) {
       files
         .filter((file) => messages[file.filename])
         .forEach((file) => {
+          // github api sometimes does not return a patch on large commits
+          if (!file.patch) {
+            return;
+          }
           var lineMap = getLineMapFromPatch(file.patch);
           messages[file.filename].forEach((message) => {
             sendComment(user, repo, number, sha, file.filename, lineMap, message);

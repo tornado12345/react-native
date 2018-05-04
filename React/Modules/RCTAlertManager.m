@@ -1,10 +1,8 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 #import "RCTAlertManager.h"
@@ -72,6 +70,7 @@ RCT_EXPORT_METHOD(alertWithArgs:(NSDictionary *)args
   NSString *defaultValue = [RCTConvert NSString:args[@"defaultValue"]];
   NSString *cancelButtonKey = [RCTConvert NSString:args[@"cancelButtonKey"]];
   NSString *destructiveButtonKey = [RCTConvert NSString:args[@"destructiveButtonKey"]];
+  UIKeyboardType keyboardType = [RCTConvert UIKeyboardType:args[@"keyboardType"]];
 
   if (!title && !message) {
     RCTLogError(@"Must specify either an alert title, or message, or both");
@@ -106,6 +105,7 @@ RCT_EXPORT_METHOD(alertWithArgs:(NSDictionary *)args
       [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.secureTextEntry = NO;
         textField.text = defaultValue;
+        textField.keyboardType = keyboardType;
       }];
       break;
     }
@@ -114,6 +114,7 @@ RCT_EXPORT_METHOD(alertWithArgs:(NSDictionary *)args
         textField.placeholder = RCTUIKitLocalizedString(@"Password");
         textField.secureTextEntry = YES;
         textField.text = defaultValue;
+        textField.keyboardType = keyboardType;
       }];
       break;
     }
@@ -121,6 +122,7 @@ RCT_EXPORT_METHOD(alertWithArgs:(NSDictionary *)args
       [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.placeholder = RCTUIKitLocalizedString(@"Login");
         textField.text = defaultValue;
+        textField.keyboardType = keyboardType;
       }];
       [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.placeholder = RCTUIKitLocalizedString(@"Password");
