@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015-present, Facebook, Inc.
+ * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -77,6 +77,13 @@ void RCTNativeModule::invoke(unsigned int methodId, folly::dynamic &&params, int
   } else if (queue) {
     dispatch_async(queue, block);
   }
+
+  #ifdef RCT_DEV
+  if (!queue) {
+    RCTLog(@"Attempted to invoke `%u` (method ID) on `%@` (NativeModule name) without a method queue.",
+           methodId, m_moduleData.name);
+  }
+  #endif
 }
 
 MethodCallResult RCTNativeModule::callSerializableNativeHook(unsigned int reactMethodId, folly::dynamic &&params) {
