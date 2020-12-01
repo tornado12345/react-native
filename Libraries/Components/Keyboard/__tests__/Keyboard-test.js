@@ -5,20 +5,20 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @format
- * @flow
+ * @flow strict-local
  * @emails oncall+react_native
  */
 
 'use strict';
 
-const Keyboard = require('Keyboard');
-const dismissKeyboard = require('dismissKeyboard');
-const LayoutAnimation = require('LayoutAnimation');
+const NativeModules = require('../../../BatchedBridge/NativeModules');
+const LayoutAnimation = require('../../../LayoutAnimation/LayoutAnimation');
+const dismissKeyboard = require('../../../Utilities/dismissKeyboard');
+const Keyboard = require('../Keyboard');
 
-const NativeEventEmitter = require('NativeEventEmitter');
-const NativeModules = require('NativeModules');
+import NativeEventEmitter from '../../../EventEmitter/NativeEventEmitter';
 
-jest.mock('LayoutAnimation');
+jest.mock('../../../LayoutAnimation/LayoutAnimation');
 
 describe('Keyboard', () => {
   beforeEach(() => {
@@ -31,6 +31,7 @@ describe('Keyboard', () => {
 
     // $FlowFixMe
     expect(Keyboard._subscriber).toBe(KeyboardEventEmitter._subscriber);
+    // $FlowFixMe Cannot access private property
     expect(Keyboard._nativeModule).toBe(KeyboardEventEmitter._nativeModule);
   });
 

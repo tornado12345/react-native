@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * This source code is licensed under the MIT license found in the
@@ -15,7 +15,6 @@ NS_ASSUME_NONNULL_BEGIN
 // that pulls in all of fabric which doesn't compile in open source yet, so we mirror the protocol
 // and duplicate the category here for now.
 
-
 @protocol RCTSurfacePresenterObserver <NSObject>
 
 @optional
@@ -27,20 +26,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol RCTSurfacePresenterStub <NSObject>
 
+- (nullable UIView *)findComponentViewWithTag_DO_NOT_USE_DEPRECATED:(NSInteger)tag;
 - (BOOL)synchronouslyUpdateViewOnUIThread:(NSNumber *)reactTag props:(NSDictionary *)props;
 - (void)addObserver:(id<RCTSurfacePresenterObserver>)observer;
 - (void)removeObserver:(id<RCTSurfacePresenterObserver>)observer;
 
 @end
 
-@implementation RCTBridge (RCTSurfacePresenterStub)
+@interface RCTBridge (RCTSurfacePresenterStub)
 
-- (id<RCTSurfacePresenterStub>)surfacePresenter
-{
-  return objc_getAssociatedObject(self, @selector(surfacePresenter));
-}
+- (id<RCTSurfacePresenterStub>)surfacePresenter;
+- (void)setSurfacePresenter:(id<RCTSurfacePresenterStub>)presenter;
 
 @end
-
 
 NS_ASSUME_NONNULL_END

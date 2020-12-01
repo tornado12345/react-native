@@ -5,12 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @format
- * @flow
+ * @flow strict
  */
 
 'use strict';
 
-require('Promise'); // make sure the default rejection handler is installed
+require('./Promise'); // make sure the default rejection handler is installed
 const rejectionTracking = require('promise/setimmediate/rejection-tracking');
 
 module.exports = () => {

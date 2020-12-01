@@ -5,26 +5,26 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @format
- * @flow
+ * @flow strict-local
  */
 
 'use strict';
 
-const BatchedBridge = require('BatchedBridge');
-const EventEmitter = require('EventEmitter');
-const TaskQueue = require('TaskQueue');
+const BatchedBridge = require('../BatchedBridge/BatchedBridge');
+const TaskQueue = require('./TaskQueue');
 
-const infoLog = require('infoLog');
+const infoLog = require('../Utilities/infoLog');
 const invariant = require('invariant');
-const keyMirror = require('fbjs/lib/keyMirror');
 
-type Handle = number;
-import type {Task} from 'TaskQueue';
+import EventEmitter from '../vendor/emitter/EventEmitter';
+
+export type Handle = number;
+import type {Task} from './TaskQueue';
 
 const _emitter = new EventEmitter();
 
-const DEBUG_DELAY = 0;
-const DEBUG = false;
+const DEBUG_DELAY: 0 = 0;
+const DEBUG: false = false;
 
 /**
  * InteractionManager allows long-running work to be scheduled after any
@@ -76,10 +76,10 @@ const DEBUG = false;
  * from executing, making apps more responsive.
  */
 const InteractionManager = {
-  Events: keyMirror({
-    interactionStart: true,
-    interactionComplete: true,
-  }),
+  Events: {
+    interactionStart: 'interactionStart',
+    interactionComplete: 'interactionComplete',
+  },
 
   /**
    * Schedule a function to run after all interactions have completed. Returns a cancellable
@@ -87,9 +87,17 @@ const InteractionManager = {
    */
   runAfterInteractions(
     task: ?Task,
-  ): {then: Function, done: Function, cancel: Function} {
-    const tasks = [];
-    const promise = new Promise(resolve => {
+  ): {
+    then: <U>(
+      onFulfill?: ?(void) => ?(Promise<U> | U),
+      onReject?: ?(error: mixed) => ?(Promise<U> | U),
+    ) => Promise<U>,
+    done: () => void,
+    cancel: () => void,
+    ...
+  } {
+    const tasks: Array<Task> = [];
+    const promise = new Promise((resolve: () => void) => {
       _scheduleUpdate();
       if (task) {
         tasks.push(task);
@@ -121,7 +129,7 @@ const InteractionManager = {
    * Notify manager that an interaction has started.
    */
   createInteractionHandle(): Handle {
-    DEBUG && infoLog('create interaction handle');
+    DEBUG && infoLog('InteractionManager: create interaction handle');
     _scheduleUpdate();
     const handle = ++_inc;
     _addInteractionSet.add(handle);
@@ -132,14 +140,14 @@ const InteractionManager = {
    * Notify manager that an interaction has completed.
    */
   clearInteractionHandle(handle: Handle) {
-    DEBUG && infoLog('clear interaction handle');
-    invariant(!!handle, 'Must provide a handle to clear.');
+    DEBUG && infoLog('InteractionManager: clear interaction handle');
+    invariant(!!handle, 'InteractionManager: Must provide a handle to clear.');
     _scheduleUpdate();
     _addInteractionSet.delete(handle);
     _deleteInteractionSet.add(handle);
   },
 
-  addListener: _emitter.addListener.bind(_emitter),
+  addListener: (_emitter.addListener.bind(_emitter): $FlowFixMe),
 
   /**
    * A positive number will use setTimeout to schedule any tasks after the
@@ -158,8 +166,6 @@ const _taskQueue = new TaskQueue({onMoreTasks: _scheduleUpdate});
 let _nextUpdateHandle = 0;
 let _inc = 0;
 let _deadline = -1;
-
-declare function setImmediate(callback: any, ...args: Array<any>): number;
 
 /**
  * Schedule an asynchronous update to the interaction state.

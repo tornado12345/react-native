@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * This source code is licensed under the MIT license found in the
@@ -130,12 +130,18 @@
 
 - (void)surface:(RCTSurface *)surface didChangeIntrinsicSize:(CGSize)intrinsicSize
 {
-  [self setIntrinsicSize:intrinsicSize];
+  __weak const auto weakSelf = self;
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [weakSelf setIntrinsicSize:intrinsicSize];
+  });
 }
 
 - (void)surface:(RCTSurface *)surface didChangeStage:(RCTSurfaceStage)stage
 {
-  [self setStage:stage];
+  __weak const auto weakSelf = self;
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [weakSelf setStage:stage];
+  });
 }
 
 @end

@@ -1,23 +1,26 @@
-/**
+/*
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
- * <p>This source code is licensed under the MIT license found in the LICENSE file in the root
- * directory of this source tree.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
+
 package com.facebook.react.views.text;
 
-import android.text.Layout;
+import android.content.Context;
 import android.text.Spannable;
-import com.facebook.react.bridge.ReactContext;
+import androidx.annotation.Nullable;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.common.annotations.VisibleForTesting;
 import com.facebook.react.module.annotations.ReactModule;
+import com.facebook.react.uimanager.IViewManagerWithChildren;
 import com.facebook.react.uimanager.ReactStylesDiffMap;
+import com.facebook.react.uimanager.StateWrapper;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.yoga.YogaMeasureMode;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 /**
  * Concrete class for {@link ReactTextAnchorViewManager} which represents view managers of anchor
@@ -25,9 +28,12 @@ import javax.annotation.Nullable;
  */
 @ReactModule(name = ReactTextViewManager.REACT_CLASS)
 public class ReactTextViewManager
-    extends ReactTextAnchorViewManager<ReactTextView, ReactTextShadowNode> {
+    extends ReactTextAnchorViewManager<ReactTextView, ReactTextShadowNode>
+    implements IViewManagerWithChildren {
 
   @VisibleForTesting public static final String REACT_CLASS = "RCTText";
+
+  protected @Nullable ReactTextViewManagerCallback mReactTextViewManagerCallback;
 
   @Override
   public String getName() {
@@ -54,6 +60,11 @@ public class ReactTextViewManager
     return new ReactTextShadowNode();
   }
 
+  public ReactTextShadowNode createShadowNodeInstance(
+      @Nullable ReactTextViewManagerCallback reactTextViewManagerCallback) {
+    return new ReactTextShadowNode(reactTextViewManagerCallback);
+  }
+
   @Override
   public Class<ReactTextShadowNode> getShadowNodeClass() {
     return ReactTextShadowNode.class;
@@ -65,53 +76,66 @@ public class ReactTextViewManager
     view.updateView();
   }
 
-  @Override
-  public Object updateLocalData(
-      ReactTextView view, ReactStylesDiffMap props, ReactStylesDiffMap localData) {
-    ReadableMap attributedString = localData.getMap("attributedString");
+  public boolean needsCustomLayoutForChildren() {
+    return true;
+  }
 
+  @Override
+  public Object updateState(
+      ReactTextView view, ReactStylesDiffMap props, @Nullable StateWrapper stateWrapper) {
+    ReadableNativeMap state = stateWrapper.getState();
+    ReadableMap attributedString = state.getMap("attributedString");
+    ReadableMap paragraphAttributes = state.getMap("paragraphAttributes");
     Spannable spanned =
-        TextLayoutManager.getOrCreateSpannableForText(view.getContext(), attributedString);
+        TextLayoutManager.getOrCreateSpannableForText(
+            view.getContext(), attributedString, mReactTextViewManagerCallback);
     view.setSpanned(spanned);
 
-    TextAttributeProps textViewProps = new TextAttributeProps(props);
-
-    // TODO add textBreakStrategy prop into local Data
-    int textBreakStrategy = Layout.BREAK_STRATEGY_HIGH_QUALITY;
-
-    // TODO add justificationMode prop into local Data
-    int justificationMode = Layout.JUSTIFICATION_MODE_NONE;
+    int textBreakStrategy =
+        TextAttributeProps.getTextBreakStrategy(paragraphAttributes.getString("textBreakStrategy"));
 
     return new ReactTextUpdate(
         spanned,
-        -1, // TODO add this into local Data?
+        state.hasKey("mostRecentEventCount") ? state.getInt("mostRecentEventCount") : -1,
         false, // TODO add this into local Data
-        textViewProps.getStartPadding(),
-        textViewProps.getTopPadding(),
-        textViewProps.getEndPadding(),
-        textViewProps.getBottomPadding(),
-        textViewProps.getTextAlign(),
+        TextAttributeProps.getTextAlignment(props, TextLayoutManager.isRTL(attributedString)),
         textBreakStrategy,
-        justificationMode
-      );
+        TextAttributeProps.getJustificationMode(props));
   }
 
   @Override
   public @Nullable Map getExportedCustomDirectEventTypeConstants() {
-    return MapBuilder.of("topTextLayout", MapBuilder.of("registrationName", "onTextLayout"));
+    return MapBuilder.of(
+        "topTextLayout", MapBuilder.of("registrationName", "onTextLayout"),
+        "topInlineViewLayout", MapBuilder.of("registrationName", "onInlineViewLayout"));
   }
 
   @Override
   public long measure(
-      ReactContext context,
+      Context context,
       ReadableMap localData,
       ReadableMap props,
+      ReadableMap state,
       float width,
       YogaMeasureMode widthMode,
       float height,
-      YogaMeasureMode heightMode) {
+      YogaMeasureMode heightMode,
+      @Nullable float[] attachmentsPositions) {
 
     return TextLayoutManager.measureText(
-        context, localData, props, width, widthMode, height, heightMode);
+        context,
+        localData,
+        props,
+        width,
+        widthMode,
+        height,
+        heightMode,
+        mReactTextViewManagerCallback,
+        attachmentsPositions);
+  }
+
+  @Override
+  public void setPadding(ReactTextView view, int left, int top, int right, int bottom) {
+    view.setPadding(left, top, right, bottom);
   }
 }
